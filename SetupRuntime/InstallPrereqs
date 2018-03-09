@@ -2,4 +2,10 @@
 
 echo Installing prequisites
 
+echo installing node.js
+
+sudo apt-get install node.js
+sudo apt-get install npm
+sudo npm install restify
+
 
