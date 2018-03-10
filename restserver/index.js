@@ -27,7 +27,6 @@ fs.readdirSync(controllers_path).forEach(function (file) {
 /*-----------------------------------------------------------*/
 /*  Set up the documents resource                            */
 /*-----------------------------------------------------------*/
-documentController = require(controllers_path + "/" + "documents.js")
 server.post("/documents", controllers.documents.createDocument)
 server.get("/documents/:id", controllers.documents.getDocumentById)
 
