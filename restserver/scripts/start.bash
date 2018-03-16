@@ -15,7 +15,7 @@ export DB_HOSTNAME=localhost
 export DB_PORT=5432
 export DB_USER=stingray_user
 export DB_PASSWORD=stingraypw
-export DB_DATABASE=stingray
+export DB_DATABASE=stingraydb
 
 #---------------------------------------------------------------------
 # Check for the DATA_DIR, create if it does not exist

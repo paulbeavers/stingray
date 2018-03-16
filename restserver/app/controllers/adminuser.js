@@ -45,72 +45,100 @@ exports.createAdminPassword = function(req, res, next) {
 	// if the passord file exists and currentadminuser and currentadminpassword
 	// are not supplied. Then this is an error.
 	//-------------------------------------------------------------------------
-	
-	if (fs.existsSync(PASSWD_FILE))
-	{
-		// This is a change password request.  Make sure the old user name and password were provided 
-
-		if (  (typeof CURRENTADMINUSER === "undefined") ||
-		      (typeof CURRENTPASSWORD === "undefineed") || 
-		      (typeof ADMINUSER === "undefined") ||
-		      (typeof PASSWORD === "undefined"))
+	var query_string = 'select * from stingray_users where user_type = \'ADMIN\'';
+	pool.query(query_string, function(error, result) {
+	    	if (error) 
 		{
-		 	ERROR_CODE = 1;
-			ERROR_TEXT = "You must provide currentadminuser, currentpassword, adminuser, password to change admin password.";
+			console.log('query failed');
 		}
 		else
 		{
-			ERROR_CODE = 0;
-			var contents = fs.readFileSync(PASSWD_FILE);
-			var jsonContent = JSON.parse(contents);
+			/*---------------------------------------------*/
+			/* check to see if this is a change or add     */
+			/*---------------------------------------------*/
+			
+			var change = 0;
+			if (result.rowCount === 0) {
+				change = 0;
+			}
+			else {
+				change = 1;
+			}
 
-			if (CURRENTADMINUSER === jsonContent.adminuser && CURRENTPASSWORD === jsonContent.password)
-			{
-				ERROR_CODE = 0;
+			if (change === 1) {
+				// 
+				// This is a change
+				//
+				if (  (typeof CURRENTADMINUSER === "undefined") ||
+				                      (typeof CURRENTPASSWORD === "undefineed") ||
+				                      (typeof ADMINUSER === "undefined") ||
+				                      (typeof PASSWORD === "undefined")) {
+				                        ERROR_CODE = 1;
+				                        ERROR_TEXT = "You must provide all fields to change admin password.";
+			        }
+				else {
+					//
+					// This is a change and we have the right fields.
+					// Now make sure the password is valid.
+					//
+					console.log(result.rows[0]);
+					if (CURRENTADMINUSER == result.rows[0].user_id &&
+						CURRENTPASSWORD === result.rows[0].password) {
+						//
+						// user is valid perform the update
+						//
+						query_string = 'update stingray_users set user_id = \'' + ADMINUSER + '\',';
+						query_string = query_string + ' password = \'' + PASSWORD + '\'';
+						query_string = query_string + ' where user_type = \'ADMIN\'';
+						console.log(query_string);
+						pool.query(query_string, function(error, result) {
+							if (error) {
+								console.log("update failed");
+							}
+							else {
+						      		console.log("update successful");
+							}
+					        });
+					}
+					else {
+						console.log("Invalid user specified.");
+					}
+				}
+
+
 			}
 			else
 			{
-				ERROR_CODE = 2;
-				ERROR_TEXT = "Invalid current username or current password provided.";
+				//
+				// This is an add
+				//
+				if (  (typeof ADMINUSER === "undefined") ||
+					                      (typeof PASSWORD === "undefineed") ) {
+					                        ERROR_CODE = 3;
+					                        ERROR_TEXT = "You must provide both username and password.";
+		                }
+				else {
+					query_string = 'insert into stingray_users (user_id, user_type, password) values ';
+					query_string = query_string + '( ' + '\'' + ADMINUSER + '\',';
+					query_string = query_string + '\'ADMIN\',';
+					query_string = query_string + '\'' + PASSWORD + '\')';
+					console.log(query_string);
+					pool.query(query_string, function(error, result) {
+			         		if (error) {
+							    console.log("insert failed");
+						}	
+		            			else {
+							console.log("insert successful");
+						}
+					});
+				}
 			}
-
 		}
-	}
-	else
-	{
-		// this is the first time the account is being set.  Make sure the username and password
-		// are provided.
 
-		if (  (typeof ADMINUSER === "undefined") ||
-		      (typeof PASSWORD === "undefineed") )
-		{
-			ERROR_CODE = 3;
-			ERROR_TEXT = "You must provide both username and password.";
-		}
-	}
 
-	if (ERROR_CODE === 0)
-	{
-		// we have valid input parameters.  Make the change.
+	});
 
-		JsonData = {"adminuser":ADMINUSER, "password":PASSWORD};
-		var str = JSON.stringify(JsonData);
-
-		fs.writeFile(PASSWD_FILE, str, function(err) {
-		    if(err) 
-		    {
-			    ERROR_CODE = 4;
-			    ERROR_TEXT = "Internal error writing admin password file";
-	            }
-		}); 
-		console.log(ERROR_TEXT)
-        	res.json({type: true, response:ERROR_TEXT})
-	}
-	else
-	{
-		// we have an error situation, report the error.
-		console.log(ERROR_TEXT)
-        	res.json({type: false, response:ERROR_TEXT})
-	}
+	res.json({type: true, response:"succcess"})
+	
 }
 
