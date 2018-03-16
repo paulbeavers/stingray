@@ -34,6 +34,7 @@ exports.createAdminPassword = function(req, res, next) {
 		if (err)
 		{	
 	    		console.log("Could not connect to database.");
+			res.json({type: false, response:"error: could not connect to database."})
         	}		
         	else
         	{
@@ -50,6 +51,7 @@ exports.createAdminPassword = function(req, res, next) {
 	    	if (error) 
 		{
 			console.log('query failed');
+			res.json({type: false, response:"error: query failed."})
 		}
 		else
 		{
@@ -94,14 +96,17 @@ exports.createAdminPassword = function(req, res, next) {
 						pool.query(query_string, function(error, result) {
 							if (error) {
 								console.log("update failed");
+								res.json({type: false, response:"error: update failed."})
 							}
 							else {
 						      		console.log("update successful");
+								res.json({type: true, response:"success: update successful."})
 							}
 					        });
 					}
 					else {
 						console.log("Invalid user specified.");
+						res.json({type: false, response:"error: invalid user specified."})
 					}
 				}
 
@@ -125,10 +130,12 @@ exports.createAdminPassword = function(req, res, next) {
 					console.log(query_string);
 					pool.query(query_string, function(error, result) {
 			         		if (error) {
-							    console.log("insert failed");
+							console.log("insert failed");
+							res.json({type: false, response:"error: insert failed."})
 						}	
 		            			else {
 							console.log("insert successful");
+							res.json({type: true, response:"success: insert succeeded."})
 						}
 					});
 				}
@@ -137,8 +144,6 @@ exports.createAdminPassword = function(req, res, next) {
 
 
 	});
-
-	res.json({type: true, response:"succcess"})
 	
 }
 
