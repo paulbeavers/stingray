@@ -15,6 +15,7 @@ exports.createAdminPassword = function(req, res, next) {
 	var PASSWORD = req.body.password;
 	var CURRENTADMINUSER = req.body.currentadminuser;
 	var CURRENTPASSWORD = req.body.currentpassword;
+	var TENANT = req.body.tenant;
 	var ERROR_TEXT = "Operation successful";
 
 	/*---------------------------------------------------*/
@@ -42,11 +43,18 @@ exports.createAdminPassword = function(req, res, next) {
 	        }
 	});
 
+	if  (typeof TENANT === "undefined") 
+	{
+		console.log("You must specify a tenant.");
+		res.json({type: false, response:"You must specify a tenant."})
+		return;
+	}
+
 	//-------------------------------------------------------------------------
 	// if the passord file exists and currentadminuser and currentadminpassword
 	// are not supplied. Then this is an error.
 	//-------------------------------------------------------------------------
-	var query_string = 'select * from stingray_users where user_type = \'ADMIN\'';
+	var query_string = 'select * from stingray_users where user_type = \'ADMIN\' and tenant_name = ' + '\'' + TENANT + '\'';
 	pool.query(query_string, function(error, result) {
 	    	if (error) 
 		{
@@ -74,6 +82,7 @@ exports.createAdminPassword = function(req, res, next) {
 				if (  (typeof CURRENTADMINUSER === "undefined") ||
 				                      (typeof CURRENTPASSWORD === "undefineed") ||
 				                      (typeof ADMINUSER === "undefined") ||
+				                      (typeof TENANT === "undefined") ||
 				                      (typeof PASSWORD === "undefined")) {
 				                        ERROR_CODE = 1;
 				                        ERROR_TEXT = "You must provide all fields to change admin password.";
@@ -91,7 +100,7 @@ exports.createAdminPassword = function(req, res, next) {
 						//
 						query_string = 'update stingray_users set user_id = \'' + ADMINUSER + '\',';
 						query_string = query_string + ' password = \'' + PASSWORD + '\'';
-						query_string = query_string + ' where user_type = \'ADMIN\'';
+						query_string = query_string + ' where user_type = \'ADMIN\' and tenant_name = \'' + TENANT + '\'';
 						console.log(query_string);
 						pool.query(query_string, function(error, result) {
 							if (error) {
@@ -118,14 +127,16 @@ exports.createAdminPassword = function(req, res, next) {
 				// This is an add
 				//
 				if (  (typeof ADMINUSER === "undefined") ||
+					(typeof TENANT === "undefined") ||
 					                      (typeof PASSWORD === "undefineed") ) {
 					                        ERROR_CODE = 3;
 					                        ERROR_TEXT = "You must provide both username and password.";
 		                }
 				else {
-					query_string = 'insert into stingray_users (user_id, user_type, password) values ';
+					query_string = 'insert into stingray_users (user_id, user_type, tenant_name, password) values ';
 					query_string = query_string + '( ' + '\'' + ADMINUSER + '\',';
 					query_string = query_string + '\'ADMIN\',';
+					query_string = query_string + '\'' + TENANT + '\',';
 					query_string = query_string + '\'' + PASSWORD + '\')';
 					console.log(query_string);
 					pool.query(query_string, function(error, result) {

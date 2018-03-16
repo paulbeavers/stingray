@@ -5,6 +5,7 @@ CREATE DATABASE stingraydb;
 \c stingraydb
 
 CREATE TABLE stingray_users (
+	    tenant_name text NOT NULL,
 	    user_id text NOT NULL,
 	    password text NOT NULL,
 	    user_type text NOT NULL
