@@ -2,6 +2,7 @@
 
 var restify = require('restify')
 var fs = require('fs')
+var pg = require('pg')
 
 /*------------------------------------------------------------*/
 /* Initialize the REST API server                             */
@@ -9,6 +10,29 @@ var fs = require('fs')
 var server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 server.use(restify.plugins.fullResponse());
+
+/*-----------------------------------------------------------*/
+/* Test the connection to the database                       */
+/*-----------------------------------------------------------*/
+const config = {
+	    user: process.env.DB_USER,
+	    database: process.env.DB_DATABASE,
+	    password: process.env.DB_PASSWORD,
+	    port: process.env.DB_PORT,
+	    host: process.env.DB_HOSTNAME
+};
+var pool = new pg.Pool(config);
+pool.connect(function(err, client, done) {
+	if (err)
+	{
+		console.log("Could not connect to database.");
+		process.exit(1);
+	}
+	else
+	{
+		console.log("Database connection successful.");
+	}
+});
 
 /*-----------------------------------------------------------*/
 /* Load the controllers from the controllers directory       */

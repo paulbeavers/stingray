@@ -1,5 +1,6 @@
 
 var fs = require('fs');
+var pg = require('pg');
 
 exports.createAdminPassword = function(req, res, next) {
 
@@ -15,6 +16,30 @@ exports.createAdminPassword = function(req, res, next) {
 	var CURRENTADMINUSER = req.body.currentadminuser;
 	var CURRENTPASSWORD = req.body.currentpassword;
 	var ERROR_TEXT = "Operation successful";
+
+	/*---------------------------------------------------*/
+	/* Set up the connection to the database             */
+	/*---------------------------------------------------*/
+
+	const config = {
+		            user: process.env.DB_USER,
+		            database: process.env.DB_DATABASE,
+		            password: process.env.DB_PASSWORD,
+		            port: process.env.DB_PORT,
+		            host: process.env.DB_HOSTNAME
+	};
+
+	var pool = new pg.Pool(config);
+	pool.connect(function(err, client, done) {
+		if (err)
+		{	
+	    		console.log("Could not connect to database.");
+        	}		
+        	else
+        	{
+        	    console.log("Database connection successful.");
+	        }
+	});
 
 	//-------------------------------------------------------------------------
 	// if the passord file exists and currentadminuser and currentadminpassword
