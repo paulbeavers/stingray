@@ -2,5 +2,5 @@
 
 echo creating schema
 
-psql -d stingray -U postgres -f stingray_schema.sql
+psql -U postgres -f stingray_schema.sql
 
