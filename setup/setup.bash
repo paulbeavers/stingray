@@ -8,4 +8,5 @@ sudo apt-get install node.js
 sudo apt-get install npm
 cd ../restserver
 sudo npm install restify
+sudo npm install pg
 
