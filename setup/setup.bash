@@ -6,8 +6,6 @@ echo installing node.js
 
 sudo apt-get install node.js
 sudo apt-get install npm
-cd ../RestServer
+cd ../restserver
 sudo npm install restify
-cd ../InstallPrereqs
-
 
