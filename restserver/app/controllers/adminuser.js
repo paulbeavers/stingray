@@ -7,7 +7,6 @@ exports.createAdminPassword = function(req, res, next) {
 	/*--------------------------------------------------*/
 	/* Validate the input variables                     */
 	/*--------------------------------------------------*/
-
 	var DATA_DIR = process.env.DATA_DIR;
 	var PASSWD_FILE = DATA_DIR + "/adminuser";
 	var ERROR_CODE = 0;
@@ -86,6 +85,7 @@ exports.createAdminPassword = function(req, res, next) {
 				                      (typeof PASSWORD === "undefined")) {
 				                        ERROR_CODE = 1;
 				                        ERROR_TEXT = "You must provide all fields to change admin password.";
+							 res.json({type: false, response:"You must provide all fields to change admin password."})
 			        }
 				else {
 					//
