@@ -52,6 +52,11 @@ fs.readdirSync(controllers_path).forEach(function (file) {
 server.post("/adminuser", controllers.adminuser.createAdminPassword)
 
 /*-----------------------------------------------------------*/
+/*  Set up the admin user resource                           */
+/*-----------------------------------------------------------*/
+server.post("/user", controllers.user.manageUser)
+
+/*-----------------------------------------------------------*/
 /*  Set up the documents resource                            */
 /*-----------------------------------------------------------*/
 server.post("/documents", controllers.documents.createDocument)
@@ -80,8 +85,10 @@ server.use(function authenticate(req, res, next) {
 			 }
 			else
 			{
-				req.usertype = result.rows[0].user_type;
-				console.log(result.rows[0].user_type);
+				req.requester_user_id = USERNAME;
+				req.requester_role = result.rows[0].user_type;
+				req.requester_tenant_name = result.rows[0].tenant_name;
+				req.reqeuster_password = PW;
 				return next();
 			}
 		}
