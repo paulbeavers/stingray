@@ -8,30 +8,6 @@ exports.manageUser = function(req, res, next) {
 	/* Validate the input variables                     */
 	/*--------------------------------------------------*/
 	var ERROR_CODE = 0;
-	var USER = req.body.user_id;
-	var PASSWORD = req.body.password;
-	var TENANT_NAME = req.body.tenant_name;
-	var ROLE = req.body.role;
-
-	var REQUESTER_USER_ID = req.requester_user_id;
-	var REQUESTER_ROLE = req.requester_role;
-	var REQUESTER_PASSWORD = req.reqeuster_password;
-	var REQUESTER_TENANT_NAME = req.requester_tenant_name;
-
-	var ERROR_TEXT = "Operation successful";
-
-	console.log("---------------------------------------------");
-	console.log("REQUESTER_USER_ID = " + REQUESTER_USER_ID);
-	console.log("REQUESTER_ROLE = " + REQUESTER_ROLE);
-	console.log("REQUESTER_PASSWORD = " + REQUESTER_PASSWORD);
-	console.log("REQUESTER_TENANT_NAME = " + REQUESTER_TENANT_NAME);
-	console.log("---------------------------------------------");
-	console.log("USER = " + USER);
-	console.log("ROLE = " + ROLE);
-	console.log("PASSWORD = " + PASSWORD);
-	console.log("TENANT_NAME = " + TENANT_NAME);
-	console.log("---------------------------------------------");
-
 
 	/*---------------------------------------------------*/
 	/* Set up the connection to the database             */
@@ -61,119 +37,78 @@ exports.manageUser = function(req, res, next) {
 	//-------------------------------------------------------------
 	// Validate input variables
 	//-------------------------------------------------------------
-	if  (typeof TENANT_NAME === "undefined") 
-	{
-		console.log("You must specify a tenant.");
-		res.json({type: false, response:"You must specify a tenant."})
-		return;
+	if (validateInput(req,res) == 0) {
+		console.log("Input variables are valid.");
 	}
 
-	//-------------------------------------------------------------------------
-	// if the passord file exists and currentadminuser and currentadminpassword
-	// are not supplied. Then this is an error.
-	//-------------------------------------------------------------------------
-	var query_string = 'select * from stingray_users where user_type = \'ADMIN\' and tenant_name = ' + '\'' + TENANT_NAME + '\'';
-	pool.query(query_string, function(error, result) {
-	    	if (error) 
-		{
-			console.log('query failed');
-			res.json({type: false, response:"error: query failed."})
-		}
-		else
-		{
-			/*---------------------------------------------*/
-			/* check to see if this is a change or add     */
-			/*---------------------------------------------*/
-			
-			var change = 0;
-			if (result.rowCount === 0) {
-				change = 0;
-			}
-			else {
-				change = 1;
-			}
-
-			if (change === 1) {
-				// 
-				// This is a change
-				//
-				if (  (typeof CURRENTADMINUSER === "undefined") ||
-				                      (typeof CURRENTPASSWORD === "undefineed") ||
-				                      (typeof ADMINUSER === "undefined") ||
-				                      (typeof TENANT_NAME === "undefined") ||
-				                      (typeof PASSWORD === "undefined")) {
-				                        ERROR_CODE = 1;
-				                        ERROR_TEXT = "You must provide all fields to change admin password.";
-							 res.json({type: false, response:"You must provide all fields to change admin password."})
-			        }
-				else {
-					//
-					// This is a change and we have the right fields.
-					// Now make sure the password is valid.
-					//
-					console.log(result.rows[0]);
-					if (CURRENTADMINUSER == result.rows[0].user_id &&
-						CURRENTPASSWORD === result.rows[0].password) {
-						//
-						// user is valid perform the update
-						//
-						query_string = 'update stingray_users set user_id = \'' + ADMINUSER + '\',';
-						query_string = query_string + ' password = \'' + PASSWORD + '\'';
-						query_string = query_string + ' where user_type = \'ADMIN\' and tenant_name = \'' + TENANT_NAME + '\'';
-						console.log(query_string);
-						pool.query(query_string, function(error, result) {
-							if (error) {
-								console.log("update failed");
-								res.json({type: false, response:"error: update failed."})
-							}
-							else {
-						      		console.log("update successful");
-								res.json({type: true, response:"success: update successful."})
-							}
-					        });
-					}
-					else {
-						console.log("Invalid user specified.");
-						res.json({type: false, response:"error: invalid user specified."})
-					}
-				}
-
-
-			}
-			else
-			{
-				//
-				// This is an add
-				//
-				if (  (typeof ADMINUSER === "undefined") ||
-					(typeof TENANT_NAME === "undefined") ||
-					                      (typeof PASSWORD === "undefineed") ) {
-					                        ERROR_CODE = 3;
-					                        ERROR_TEXT = "You must provide both username and password.";
-		                }
-				else {
-					query_string = 'insert into stingray_users (user_id, user_type, tenant_name, password) values ';
-					query_string = query_string + '( ' + '\'' + ADMINUSER + '\',';
-					query_string = query_string + '\'ADMIN\',';
-					query_string = query_string + '\'' + TENANT_NAME + '\',';
-					query_string = query_string + '\'' + PASSWORD + '\')';
-					console.log(query_string);
-					pool.query(query_string, function(error, result) {
-			         		if (error) {
-							console.log("insert failed");
-							res.json({type: false, response:"error: insert failed."})
-						}	
-		            			else {
-							console.log("insert successful");
-							res.json({type: true, response:"success: insert succeeded."})
-						}
-					});
-				}
-			}
-		}
-
-
-	});
+	//------------------------------------------------------------
+	// Check for password update
+	//------------------------------------------------------------
 	
+	if (req.body.user_id === req.requester_user_id &&
+		req.body.tenant_name == req.requester_tenant_name)
+	{
+		// this is a password update, update the password.
+		qs = prepareUpdatePasswordSQL(req, res);
+	}
+
+	//----------------------------------------------------------
+	// Check for adding a new user
+	//----------------------------------------------------------
+	
+	//----------------------------------------------------------
+	// Execute the update on the database
+	// ---------------------------------------------------------
+	
+	pool.query(qs, function(error, result) {
+		if (error) {
+			res.json({type: false, response:"error: update failed."});
+		}
+		else {
+			res.json({type: true, response:"success: update successful."})
+                }
+        });
+}
+
+//---------------------------------------------------------------
+// End of main function
+//---------------------------------------------------------------
+
+//---------------------------------------------------------------
+// Validate input
+//---------------------------------------------------------------
+function validateInput(req, res)
+{
+	var ERROR_CODE = 0;
+
+	// Log the input variables
+	console.log("req.requester_user_id = " + req.requester_user_id);
+	console.log("req.requester_role = " + req.requester_role);
+	console.log("req.requester_password = " + req.requester_password);
+	console.log("req.requester_tenant_name = " + req.requester_tenant_name);
+	console.log("req.body.user_id = " + req.body.user_id);
+	console.log("req.body.role = " + req.body.role);
+	console.log("req.body.password = " + req.body.password);
+	console.log("req.body.tenant_name = " + req.body.tenant_name);
+
+	if  (typeof req.requester_tenant_name === "undefined") {
+		console.log("You must specify a tenant.");
+		ERROR_CODE = 1;
+        }
+
+
+	return ERROR_CODE;
+}
+
+//--------------------------------------------------------------------
+// Prepare Password Update SQL
+//--------------------------------------------------------------------
+function prepareUpdatePasswordSQL(req, res)
+{
+	qs = 'update stingray_users set password = \'' + req.body.password + '\'';
+	qs = qs + ' where user_id = \'' + req.requester_user_id + '\' and ';
+	qs = qs + ' tenant_name = \'' + req.requester_tenant_name + '\'';
+
+	return qs;
 }
 

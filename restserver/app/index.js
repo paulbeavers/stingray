@@ -88,7 +88,7 @@ server.use(function authenticate(req, res, next) {
 				req.requester_user_id = USERNAME;
 				req.requester_role = result.rows[0].user_type;
 				req.requester_tenant_name = result.rows[0].tenant_name;
-				req.reqeuster_password = PW;
+				req.requester_password = PW;
 				return next();
 			}
 		}
