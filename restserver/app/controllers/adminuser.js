@@ -17,6 +17,11 @@ exports.createAdminPassword = function(req, res, next) {
 	var TENANT = req.body.tenant;
 	var ERROR_TEXT = "Operation successful";
 
+	console.log("-------------");
+	console.log(req.usertype);
+	console.log("-------------");
+
+
 	/*---------------------------------------------------*/
 	/* Set up the connection to the database             */
 	/*---------------------------------------------------*/

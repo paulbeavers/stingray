@@ -10,6 +10,7 @@ var pg = require('pg')
 var server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 server.use(restify.plugins.fullResponse());
+server.use(restify.plugins.authorizationParser());
 
 /*-----------------------------------------------------------*/
 /* Test the connection to the database                       */
@@ -55,6 +56,37 @@ server.post("/adminuser", controllers.adminuser.createAdminPassword)
 /*-----------------------------------------------------------*/
 server.post("/documents", controllers.documents.createDocument)
 server.get("/documents/:id", controllers.documents.getDocumentById)
+
+/*------------------------------------------------------------*/
+/* Add handler to check the user account                      */
+/*------------------------------------------------------------*/
+server.use(function authenticate(req, res, next) {
+	var USERNAME = req.authorization.basic.username;
+	var PW = req.authorization.basic.password;
+	console.log(req.authorization.basic.username);
+	console.log(req.authorization.basic.password);
+	console.log("authorizing");
+	var query_string = 'select * from stingray_users where user_id = ' + '\'' + USERNAME + '\' and ';
+	query_string = query_string + 'password = ' + '\'' + PW + '\'';
+	console.log(query_string);
+	pool.query(query_string, function(error, result) {
+		if (error) {
+			console.log('query failed');
+	    		res.json({type: false, response:"error: query failed."})
+	        }
+                else {
+			 if (result.rowCount === 0) {
+				 res.json({type: false, response:"authorization failed."})
+			 }
+			else
+			{
+				req.usertype = result.rows[0].user_type;
+				console.log(result.rows[0].user_type);
+				return next();
+			}
+		}
+	});
+});
 
 /*---------------------------------------------------------------*/
 /*  Start the REST API server                                    */

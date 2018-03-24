@@ -5,7 +5,9 @@
 # adminuser
 #-------------------------------------------------------------
 
-curl -H "Content-Type: application/json" -X POST http://localhost:2999/adminuser \
+curl -H "Content-Type: application/json"  \
+	-X POST http://localhost:2999/adminuser \
+	-u paul:pw \
 -d  @- <<'EOF'
 
 {  "tenant":"Tenant 3",  
