@@ -11,8 +11,13 @@ CREATE TABLE stingray_users (
 	    user_type text NOT NULL
 );
 
+CREATE UNIQUE INDEX stingray_users_index ON stingray_users (user_id, tenant_name);
+
 CREATE user stingray_user with password 'stingraypw';
 
 GRANT all on stingray_users to stingray_user;
+
+INSERT into stingray_users (tenant_name, user_id, password, user_type) 
+	VALUES ('MASTER', 'STINGRAY', 'stingraypw', 'SUPERADMIN');
 
 
