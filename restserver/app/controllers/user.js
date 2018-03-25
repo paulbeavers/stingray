@@ -50,24 +50,46 @@ exports.manageUser = function(req, res, next) {
 	{
 		// this is a password update, update the password.
 		qs = prepareUpdatePasswordSQL(req, res);
+		pool.query(qs, function(error, result) {
+			if (error) {
+				res.json({type: false, response:"error: update failed."});
+			}
+			else {
+				res.json({type: true, response:"success: update successful."})
+                	}
+        	});
 	}
+	else {
+		//----------------------------------------------------------
+		// Check for adding a new user
+		//----------------------------------------------------------
 
-	//----------------------------------------------------------
-	// Check for adding a new user
-	//----------------------------------------------------------
-	
-	//----------------------------------------------------------
-	// Execute the update on the database
-	// ---------------------------------------------------------
-	
-	pool.query(qs, function(error, result) {
-		if (error) {
-			res.json({type: false, response:"error: update failed."});
+		if (req.requester_user_type === "SUPERADMIN" ||
+			(req.requester_user_type === "TENANTADMIN" && 
+				req.requester_tenant_name == req.body.tenant_name) && 
+				(req.body.user_type != "SUPERADMIN")) {
+			qs = prepareInsertStatement(req, res);
+			pool.query(qs, function(error, result) {
+			        if (error) {
+					qs = prepareUpdateStatement(req, res);
+					pool.query(qs, function(error, result) {
+						if (error) {
+							res.json({type: false, response:"error: update and insert failed."});
+						}
+						else {
+							res.json({type: true, response:"success: update successful."})
+						}
+					});
+		        	}
+		        	else {
+			        	res.json({type: true, response:"success: update successful."})
+				}
+	                });
 		}
 		else {
-			res.json({type: true, response:"success: update successful."})
-                }
-        });
+			res.json({type: false, response:"user not authorized to make this change"});
+		}
+	}
 }
 
 //---------------------------------------------------------------
@@ -110,5 +132,25 @@ function prepareUpdatePasswordSQL(req, res)
 	qs = qs + ' tenant_name = \'' + req.requester_tenant_name + '\'';
 
 	return qs;
+}
+
+function prepareInsertStatement(req, res)
+{
+	qs = 'insert into stingray_users (user_id, user_type, tenant_name, password) values ';
+	qs = qs + '( ' + '\'' + req.body.user_id + '\',';
+	qs = qs + '\'' + req.body.role +  '\',';
+	qs = qs +  '\'' + req.body.tenant_name + '\',';
+	qs = qs + '\'' + req.body.password + '\')';
+
+	return qs;
+}
+
+function prepareUpdateStatement(req, res)
+{
+	qs = 'update stingray_users set password = \'' + req.body.password + '\'';
+        qs = qs + ' where user_id = \'' + req.body.user_id + '\' and ';
+        qs = qs + ' tenant_name = \'' + req.body.tenant_name+ '\'';
+
+        return qs;
 }
 

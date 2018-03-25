@@ -66,13 +66,14 @@ server.get("/documents/:id", controllers.documents.getDocumentById)
 /* Add handler to check the user account                      */
 /*------------------------------------------------------------*/
 server.use(function authenticate(req, res, next) {
+	console.log("authrnticating");
 	var USERNAME = req.authorization.basic.username;
 	var PW = req.authorization.basic.password;
 	console.log(req.authorization.basic.username);
 	console.log(req.authorization.basic.password);
 	console.log("authorizing");
-	var query_string = 'select * from stingray_users where user_id = ' + '\'' + USERNAME + '\' and ';
-	query_string = query_string + 'password = ' + '\'' + PW + '\'';
+	var query_string = 'select * from stingray_users where user_id = ' + '\'' + req.authorization.basic.username + '\' and ';
+	query_string = query_string + 'password = ' + '\'' + req.authorization.basic.password + '\'';
 	console.log(query_string);
 	pool.query(query_string, function(error, result) {
 		if (error) {
@@ -85,10 +86,22 @@ server.use(function authenticate(req, res, next) {
 			 }
 			else
 			{
-				req.requester_user_id = USERNAME;
+				req.requester_user_id = req.authorization.basic.username;
 				req.requester_role = result.rows[0].user_type;
 				req.requester_tenant_name = result.rows[0].tenant_name;
-				req.requester_password = PW;
+				req.requester_password = req.authorization.basic.password;
+
+				console.log("req.requester_user_id = " + req.requester_user_id);
+				console.log("req.requester_role = " + req.requester_role);
+				console.log("req.requester_password = " + req.requester_password);
+				console.log("req.requester_tenant_name = " + req.requester_tenant_name);
+				console.log("req.body.user_id = " + req.body.user_id);
+				console.log("req.body.role = " + req.body.role);
+				console.log("req.body.password = " + req.body.password);
+				console.log("req.body.tenant_name = " + req.body.tenant_name);
+
+
+
 				return next();
 			}
 		}
