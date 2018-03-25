@@ -47,12 +47,7 @@ fs.readdirSync(controllers_path).forEach(function (file) {
 })
 
 /*-----------------------------------------------------------*/
-/*  Set up the admin user resource                           */
-/*-----------------------------------------------------------*/
-server.post("/adminuser", controllers.adminuser.createAdminPassword)
-
-/*-----------------------------------------------------------*/
-/*  Set up the admin user resource                           */
+/*  Set up the user resource                                 */
 /*-----------------------------------------------------------*/
 server.post("/user", controllers.user.manageUser)
 
@@ -72,7 +67,17 @@ server.use(function authenticate(req, res, next) {
 	console.log(req.authorization.basic.username);
 	console.log(req.authorization.basic.password);
 	console.log("authorizing");
+	
+	if (USERNAME === "STINGRAY")
+	{
+		TNAME = "MASTER";
+	}
+	else {
+		TNAME = req.body.tenant_name;
+	}
+
 	var query_string = 'select * from stingray_users where user_id = ' + '\'' + req.authorization.basic.username + '\' and ';
+	query_string = query_string + 'tenant_name = ' + '\'' + TNAME + '\' and ';
 	query_string = query_string + 'password = ' + '\'' + req.authorization.basic.password + '\'';
 	console.log(query_string);
 	pool.query(query_string, function(error, result) {

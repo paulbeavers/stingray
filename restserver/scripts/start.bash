@@ -18,15 +18,6 @@ export DB_PASSWORD=stingraypw
 export DB_DATABASE=stingraydb
 
 #---------------------------------------------------------------------
-# Check for the DATA_DIR, create if it does not exist
-#---------------------------------------------------------------------
-echo "DATA_DIR=$DATA_DIR"
-if [ ! -d "$DATA_DIR" ] ; then
-	echo "$DATA_DIR does not exist. Attempting to create."
-	mkdir $DATA_DIR
-fi
-
-#---------------------------------------------------------------------
 # Start the server
 #---------------------------------------------------------------------
 cd ../app

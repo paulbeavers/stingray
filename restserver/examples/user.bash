@@ -12,7 +12,7 @@ curl -H "Content-Type: application/json"  \
 
 {  "tenant_name":"Tenant 3",  
     "user_id":"paul", 
-    "password":"duck",  
+    "password":"donald",  
     "role":"ADMIN" 
 }
 

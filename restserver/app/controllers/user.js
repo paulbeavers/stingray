@@ -64,10 +64,10 @@ exports.manageUser = function(req, res, next) {
 		// Check for adding a new user
 		//----------------------------------------------------------
 
-		if (req.requester_user_type === "SUPERADMIN" ||
-			(req.requester_user_type === "TENANTADMIN" && 
+		if (req.requester_role === "SUPERADMIN" ||
+			(req.requester_role === "TENANTADMIN" && 
 				req.requester_tenant_name == req.body.tenant_name) && 
-				(req.body.user_type != "SUPERADMIN")) {
+				(req.body.role != "SUPERADMIN")) {
 			qs = prepareInsertStatement(req, res);
 			pool.query(qs, function(error, result) {
 			        if (error) {
