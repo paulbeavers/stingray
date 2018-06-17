@@ -50,6 +50,7 @@ fs.readdirSync(controllers_path).forEach(function (file) {
 /*  Set up the user resource                                 */
 /*-----------------------------------------------------------*/
 server.post("/user", controllers.user.manageUser)
+server.get("/users", controllers.user.getUsers)
 
 /*-----------------------------------------------------------*/
 /*  Set up the documents resource                            */

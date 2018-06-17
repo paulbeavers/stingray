@@ -2,6 +2,11 @@
 var fs = require('fs');
 var pg = require('pg');
 
+
+/*-----------------------------------------------------*/
+/* implement the manage user route                     */
+/*-----------------------------------------------------*/
+
 exports.manageUser = function(req, res, next) {
 
 	/*--------------------------------------------------*/
@@ -120,6 +125,59 @@ function validateInput(req, res)
 
 
 	return ERROR_CODE;
+}
+
+/*-----------------------------------------------------*/
+/* implement the get user route                        */
+/*-----------------------------------------------------*/
+
+exports.getUsers = function(req, res, next) {
+	/*---------------------------------------------------*/
+        /* Set up the connection to the database             */
+        /*---------------------------------------------------*/
+
+	const config = {
+                            user: process.env.DB_USER,
+                            database: process.env.DB_DATABASE,
+                            password: process.env.DB_PASSWORD,
+                            port: process.env.DB_PORT,
+                            host: process.env.DB_HOSTNAME
+        };
+
+        var pool = new pg.Pool(config);
+        pool.connect(function(err, client, done) {
+                if (err)
+                {
+                        console.log("Could not connect to database.");
+                        res.json({type: false, response:"error: could not connect to database."})
+                }
+                else
+                {
+                    console.log("Database connection successful.");
+                }
+        });
+
+	var query_string = 'select * from stingray_users'; 
+        pool.query(query_string, function(error, result) {
+                if (error) {
+                        console.log('query failed');
+                        res.json({type: false, response:"error: query failed."})
+                }
+                else {
+                         if (result.rowCount === 0) {
+                                 res.json({type: false, response:"authorization failed."})
+                         }
+                        else
+                        {
+                                console.log(result.rows)
+
+				res.json(result.rows)
+
+                                return next();
+			}
+		}
+	});
+
 }
 
 //--------------------------------------------------------------------
