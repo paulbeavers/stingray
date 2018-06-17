@@ -1,0 +1,35 @@
+
+
+1. Run the following command
+
+> sudo apt-get install postgressql
+
+2.  Log into postgres using the postgres user and set a password
+
+> sudo su postgres
+> psql 
+> alter user postgres with password 'postgres';
+> control-d to exit psql.
+> exit
+
+3. Setup postgres for password authentication
+
+> cd /etc/postgresql/10/main
+> sudo vi pg_hba.conf
+
+> change the line: 
+	local   all             postgres     peer
+  to
+	local   all             postgres     md5 
+
+> save the file and restart postgres
+
+> sudo systemctl restart postgresql
+
+4.  Run the schema creation script 
+
+
+
+
+
+
