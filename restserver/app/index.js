@@ -60,6 +60,11 @@ server.post("/documents", controllers.documents.createDocument)
 server.get("/documents/:id", controllers.documents.getDocumentById)
 
 /*------------------------------------------------------------*/
+/* Set up the heartbeat resource                              */
+/*------------------------------------------------------------*/
+server.post("/heartbeat", controllers.heartbeat.addHeartbeat)
+
+/*------------------------------------------------------------*/
 /* Add handler to check the user account                      */
 /*------------------------------------------------------------*/
 server.use(function authenticate(req, res, next) {
