@@ -4,6 +4,15 @@ var restify = require('restify')
 var fs = require('fs')
 var pg = require('pg')
 
+/*-------------------------------------------------------------*/
+/* Set up logging                                              */
+/*-------------------------------------------------------------*/
+logger = require("./stingrayLog")
+
+logger.info('Hello world');
+logger.warn('Warning message');
+logger.debug('Debugging info');
+
 /*------------------------------------------------------------*/
 /* Initialize the REST API server                             */
 /*------------------------------------------------------------*/

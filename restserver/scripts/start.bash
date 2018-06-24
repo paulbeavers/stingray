@@ -16,6 +16,8 @@ export DB_PORT=5432
 export DB_USER=stingray_user
 export DB_PASSWORD=stingraypw
 export DB_DATABASE=stingraydb
+export LOG_DIR="$SERVER_HOME/log"
+export LOG_LEVEL="info"
 
 #---------------------------------------------------------------------
 # Start the server

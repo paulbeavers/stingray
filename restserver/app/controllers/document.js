@@ -2,6 +2,7 @@
 var fs = require('fs');
 var pg = require('pg');
 
+logger = require("../stingrayLog");
 
 /*-----------------------------------------------------*/
 /* implement the manage user route                     */
@@ -9,6 +10,7 @@ var pg = require('pg');
 
 exports.addDocument = function(req, res, next) {
 
+	logger.info("received document request");
 	/*--------------------------------------------------*/
 	/* Validate the input variables                     */
 	/*--------------------------------------------------*/
