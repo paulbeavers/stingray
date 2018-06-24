@@ -7,7 +7,7 @@
 
 curl -H "Content-Type: application/json"  \
 	-X POST http://localhost:2999/heartbeat \
-	-u STINGRAY:mypw \
+	-u STINGRAY:stingraypw \
 -d  @- <<'EOF'
 
 {  "tenant_name":"New Tenant 2",  
