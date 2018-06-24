@@ -12,9 +12,11 @@ exports.addDocument = function(req, res, next) {
 	/*--------------------------------------------------*/
 	/* Validate the input variables                     */
 	/*--------------------------------------------------*/
-	var ERROR_CODE = 0;
-
+	console.log("------------ body -------------");
 	console.log(req.body);
+	console.log("------------- end body --------");
+	res.json({type: true, response:"document loaded"})
+
 
 }
 
