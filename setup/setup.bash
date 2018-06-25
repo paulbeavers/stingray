@@ -9,4 +9,5 @@ sudo apt-get install npm
 cd ../restserver
 sudo npm install restify
 sudo npm install pg
+sudo npm install winston
 
