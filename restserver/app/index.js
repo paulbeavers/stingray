@@ -9,9 +9,8 @@ var pg = require('pg')
 /*-------------------------------------------------------------*/
 logger = require("./stingrayLog")
 
-logger.info('Hello world');
-logger.warn('Warning message');
-logger.debug('Debugging info');
+logger.info('stingray rest endpoint server starting up');
+logger.debug('debug messages are enabled');
 
 /*------------------------------------------------------------*/
 /* Initialize the REST API server                             */
@@ -35,12 +34,12 @@ var pool = new pg.Pool(config);
 pool.connect(function(err, client, done) {
 	if (err)
 	{
-		console.log("Could not connect to database.");
+		logger.error('Could not connect to postgres database, exiting');
 		process.exit(1);
 	}
 	else
 	{
-		console.log("Database connection successful.");
+		logger.info('Databaase connection successful.');
 	}
 });
 
@@ -82,12 +81,9 @@ server.post("/document", controllers.document.addDocument)
 /* Add handler to check the user account                      */
 /*------------------------------------------------------------*/
 server.use(function authenticate(req, res, next) {
-	console.log("authrnticating");
+	logger.info("Authenticating");
 	var USERNAME = req.authorization.basic.username;
 	var PW = req.authorization.basic.password;
-	console.log(req.authorization.basic.username);
-	console.log(req.authorization.basic.password);
-	console.log("authorizing");
 	
 	if (USERNAME === "STINGRAY")
 	{
@@ -100,23 +96,33 @@ server.use(function authenticate(req, res, next) {
 	var query_string = 'select * from stingray_users where user_id = ' + '\'' + req.authorization.basic.username + '\' and ';
 	query_string = query_string + 'tenant_name = ' + '\'' + TNAME + '\' and ';
 	query_string = query_string + 'password = ' + '\'' + req.authorization.basic.password + '\'';
-	console.log(query_string);
+	logger.info(query_string);
 	pool.query(query_string, function(error, result) {
 		if (error) {
-			console.log('query failed');
+			logger.error('postgres query failed. Check databse configuration.');
 	    		res.json({type: false, response:"error: query failed."})
 	        }
                 else {
 			 if (result.rowCount === 0) {
-				 res.json({type: false, response:"authorization failed."})
+				
+				 logger.info('Unauthorized access by user ' + req.authorization.basic.username + 
+					' with password ' + req.authorization.basic.password + ' tenant ' +
+					TNAME);
+
+				res.json({type: false, response:"authorization failed."})
 			 }
 			else
 			{
+				 logger.info('Authorized access by user ' + req.authorization.basic.username + 
+					' with password ' + req.authorization.basic.password + ' tenant ' +
+					TNAME);
+
 				req.requester_user_id = req.authorization.basic.username;
 				req.requester_role = result.rows[0].user_type;
 				req.requester_tenant_name = result.rows[0].tenant_name;
 				req.requester_password = req.authorization.basic.password;
 
+				/*
 				console.log("req.requester_user_id = " + req.requester_user_id);
 				console.log("req.requester_role = " + req.requester_role);
 				console.log("req.requester_password = " + req.requester_password);
@@ -125,6 +131,7 @@ server.use(function authenticate(req, res, next) {
 				console.log("req.body.role = " + req.body.role);
 				console.log("req.body.password = " + req.body.password);
 				console.log("req.body.tenant_name = " + req.body.tenant_name);
+				*/
 
 
 
@@ -140,9 +147,9 @@ server.use(function authenticate(req, res, next) {
 var port = process.env.PORT || 3000;
 server.listen(port, function (err) {
 	if (err)
-	        console.error(err)
+		logger.error(err);
 	else
-	        console.log('App is ready at : ' + port)
+	        logger.info('App is ready at : ' + port)
 })
 
 

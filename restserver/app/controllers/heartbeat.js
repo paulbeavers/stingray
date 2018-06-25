@@ -1,13 +1,16 @@
 
+
 var fs = require('fs');
 var pg = require('pg');
 
+logger = require("../stingrayLog");
 
 /*-----------------------------------------------------*/
 /* implement the manage user route                     */
 /*-----------------------------------------------------*/
 
 exports.addHeartbeat = function(req, res, next) {
+	logger.info("Entering function heartbeat.addHeartbeat()");
 
 	/*--------------------------------------------------*/
 	/* Validate the input variables                     */
@@ -30,12 +33,12 @@ exports.addHeartbeat = function(req, res, next) {
 	pool.connect(function(err, client, done) {
 		if (err)
 		{	
-	    		console.log("Could not connect to database.");
+			logger.error("Error could not connect to database.");
 			res.json({type: false, response:"error: could not connect to database."})
         	}		
         	else
         	{
-        	    console.log("Database connection successful.");
+			logger.info("Database connection successful.");
 	        }
 	});
 
@@ -44,21 +47,22 @@ exports.addHeartbeat = function(req, res, next) {
 	//-------------------------------------------------------------
 	if (validateInput(req,res) == 0) {
 
-		console.log("Input variables are valid.");
+		logger.info("Input variables are valid.");
 	}
 
 	//------------------------------------------------------------
 	// Insert the heartbeat into the database
 	//-----------------------------------------------------------
 	qs = prepareInsertStatement(req, res);
-	console.log(qs);
+	logger.info(qs);
 	pool.query(qs, function(error, result) {
        		if (error) {
-			console.log(error);
+			logger.error("Heartbeat insert failed.");
         		res.json({type: true, response:"error: insert failed"})
 		}
 		else
 		{
+			logger.info("Heartbeat insert successful.");
         		res.json({type: true, response:"success: update successful."})
 		}
 	});
@@ -75,19 +79,8 @@ function validateInput(req, res)
 {
 	var ERROR_CODE = 0;
 
-	// Log the input variables
-	console.log("req.requester_user_id = " + req.requester_user_id);
-	console.log("req.requester_role = " + req.requester_role);
-	console.log("req.requester_password = " + req.requester_password);
-	console.log("req.requester_tenant_name = " + req.requester_tenant_name);
-	console.log("req.body.user_id = " + req.body.user_id);
-	console.log("req.body.role = " + req.body.role);
-	console.log("req.body.password = " + req.body.password);
-	console.log("req.body.tenant_name = " + req.body.tenant_name);
-	console.log("req.body.device_name = " + req.body.device_name);
-
 	if  (typeof req.requester_tenant_name === "undefined") {
-		console.log("You must specify a tenant.");
+		logger.error("You must specify a tenant.");
 		ERROR_CODE = 1;
         }
 

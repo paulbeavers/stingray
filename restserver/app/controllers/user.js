@@ -2,6 +2,8 @@
 var fs = require('fs');
 var pg = require('pg');
 
+logger = require("../stingrayLog");
+
 
 /*-----------------------------------------------------*/
 /* implement the manage user route                     */
@@ -30,12 +32,12 @@ exports.manageUser = function(req, res, next) {
 	pool.connect(function(err, client, done) {
 		if (err)
 		{	
-	    		console.log("Could not connect to database.");
+			logger.error("Could not connect to database.");
 			res.json({type: false, response:"error: could not connect to database."})
         	}		
         	else
         	{
-        	    console.log("Database connection successful.");
+			logger.info("Database connection successful.");
 	        }
 	});
 
@@ -43,7 +45,7 @@ exports.manageUser = function(req, res, next) {
 	// Validate input variables
 	//-------------------------------------------------------------
 	if (validateInput(req,res) == 0) {
-		console.log("Input variables are valid.");
+		logger.info("Input arguments are valid.");
 	}
 
 	//------------------------------------------------------------
@@ -53,13 +55,15 @@ exports.manageUser = function(req, res, next) {
 	if (req.body.user_id === req.requester_user_id &&
 		req.body.tenant_name == req.requester_tenant_name)
 	{
-		// this is a password update, update the password.
+		logger.info("This is a password change request, update the password.");
 		qs = prepareUpdatePasswordSQL(req, res);
 		pool.query(qs, function(error, result) {
 			if (error) {
+				logger.error("Error password update failed");
 				res.json({type: false, response:"error: update failed."});
 			}
 			else {
+				logger.info("Password update successful.");
 				res.json({type: true, response:"success: update successful."})
                 	}
         	});
@@ -79,19 +83,23 @@ exports.manageUser = function(req, res, next) {
 					qs = prepareUpdateStatement(req, res);
 					pool.query(qs, function(error, result) {
 						if (error) {
+							logger.error("Error insert and update failed.");
 							res.json({type: false, response:"error: update and insert failed."});
 						}
 						else {
+							logger.info("User updated successfully.");
 							res.json({type: true, response:"success: update successful."})
 						}
 					});
 		        	}
 		        	else {
+					logger.info("New user added successfully.");
 			        	res.json({type: true, response:"success: update successful."})
 				}
 	                });
 		}
 		else {
+			logger.error("User unauthorized to make this change.");
 			res.json({type: false, response:"user not authorized to make this change"});
 		}
 	}
