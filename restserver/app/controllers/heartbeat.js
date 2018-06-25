@@ -95,7 +95,7 @@ function validateInput(req, res)
 function prepareInsertStatement(req, res)
 {
 	qs = 'insert into stingray_heartbeat (user_id, tenant_name, message_text, device_name) values ';
-	qs = qs + '( ' + '\'' + req.body.user_id + '\',';
+	qs = qs + '( ' + '\'' + req.requester_user_id + '\',';
 	qs = qs +  '\'' + req.body.tenant_name + '\',';
 	qs = qs +  '\'' + req.body.message_text + '\',';
 	qs = qs + '\'' + req.body.device_name + '\')';

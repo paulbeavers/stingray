@@ -10,9 +10,9 @@ curl -H "Content-Type: application/json"  \
 	-u STINGRAY:mypw \
 -d  @- <<'EOF'
 
-{  "tenant_name":"New Tenant 2",  
+{  "tenant_name":"New Tenant 3",  
     "user_id":"paul_beavers@mac.com", 
-    "password":"pw2",  
+    "password":"pw3",  
     "role":"TENANTADMIN" 
 }
 
