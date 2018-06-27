@@ -1,0 +1,27 @@
+
+[Unit]
+Description=Rest API end point server for data ingestion
+Documentation=https://example.com
+After=postgresql.target
+
+[Service]
+Environment=NODE_PORT=3001
+Environment=PORT=2999
+Environment=SERVER_HOME=/home/pbeavers/stingray/restserver
+Environment=DATA_DIR="$SERVER_HOME/data"
+Environment=DB_STRING=postgres://stingray_user:stingraypw@localhost:5432/stingraydb
+Environment=DB_HOSTNAME=localhost
+Environment=DB_PORT=5432
+Environment=DB_USER=stingray_user
+Environment=DB_PASSWORD=stingraypw
+Environment=DB_DATABASE=stingraydb
+Environment=LOG_DIR=/home/pbeavers/stingray/restserver/log
+Environment=LOG_LEVEL="info"
+WorkingDirectory=/home/pbeavers/stingray/restserver/app
+User=pbeavers
+Type=simple
+ExecStart=/usr/bin/node /home/pbeavers/stingray/restserver/app/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
