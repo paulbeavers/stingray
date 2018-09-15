@@ -34,6 +34,4 @@ RUN /opt/stingray/setup/dockersetup.bash
 # install the product pre-requisites                          #
 #-------------------------------------------------------------#
 
-CMD ["/usr/sbin/sshd", "-D"]
-CMD ["/opt/stingray/restserver/scripts/dockerstart.bash", "-D"]
-
+CMD /opt/stingray/restserver/scripts/dockerstart.bash
