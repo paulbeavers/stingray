@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t restserver .
+docker build --no-cache -t restserver .

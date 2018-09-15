@@ -24,30 +24,10 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 #-------------------------------------------------------------#
 # Copy the rest server product files to the container         #
 #-------------------------------------------------------------#
-RUN mkdir /opt/stingray
-
-RUN mkdir /opt/stingray/restserver
-
-RUN mkdir /opt/stingray/restserver/app
-COPY /Users/pbeavers/stingray/restserver/app/* /opt/stingray/restserver/app
-
-RUN mkdir /opt/stingray/restserver/conf
-COPY ../conf/* /opt/stingray/restserver/conf
-
-RUN mkdir /opt/stingray/restserver/examples
-COPY ../examples/* /opt/stingray/restserver/examples
-
-RUN mkdir /opt/stingray/restserver/scripts
-COPY ../examples/* /opt/stingray/restserver/scripts
-
-RUN mkdir /opt/stingray/setup
-COPY ../../setup/* /opt/stingray/setup
-
-
-
-
-
-
+RUN apt-get -y install git
+RUN apt-get -y  install vim
+RUN git clone https://github.com/paulbeavers/stingray.git /opt/stingray
+RUN /opt/stingray/setup/dockersetup.bash
 
 #-------------------------------------------------------------#
 # install the product pre-requisites                          #
