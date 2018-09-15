@@ -22,7 +22,7 @@ export LOG_LEVEL="info"
 #---------------------------------------------------------------------
 # Start the server
 #---------------------------------------------------------------------
-cd ../app
+cd /opt/stingray/restserver/app
 node ./index.js
 
 
