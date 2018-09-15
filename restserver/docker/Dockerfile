@@ -13,6 +13,7 @@ RUN mkdir /var/run/sshd
 RUN echo "root:PbDb0908" | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 EXPOSE 22
+EXPOSE 2999
 
 #-------------------------------------------------------------#
 # SSH login fix. Otherwise user is kicked off after login     #
@@ -33,7 +34,6 @@ RUN /opt/stingray/setup/dockersetup.bash
 # install the product pre-requisites                          #
 #-------------------------------------------------------------#
 
-
-
 CMD ["/usr/sbin/sshd", "-D"]
+CMD ["/opt/stingray/restserver/scripts/dockerstart.bash", "-D"]
 
