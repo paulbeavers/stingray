@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker run -d -p 2323:22 restserver
+docker run -d -p 2424:22 restserver
 
