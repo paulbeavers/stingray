@@ -19,6 +19,9 @@ export DB_DATABASE=stingraydb
 export LOG_DIR="$SERVER_HOME/log"
 export LOG_LEVEL="info"
 
+
+/usr/sbin/sshd -D &
+
 #---------------------------------------------------------------------
 # Start the server
 #---------------------------------------------------------------------
