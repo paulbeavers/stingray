@@ -20,12 +20,12 @@ export LOG_DIR="$SERVER_HOME/log"
 export LOG_LEVEL="info"
 
 
-/usr/sbin/sshd -D &
-
 #---------------------------------------------------------------------
 # Start the server
 #---------------------------------------------------------------------
 cd /opt/stingray/restserver/app
-node ./index.js
+node ./index.js &
+
+/usr/sbin/sshd -D
 
 
