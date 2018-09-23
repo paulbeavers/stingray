@@ -6,8 +6,8 @@
 #-------------------------------------------------------------
 
 curl -H "Content-Type: application/json"  \
-	-X POST http://localhost:2999/user \
-	-u STINGRAY:mypw \
+	-X POST http://localhost:2998/user \
+	-u STINGRAY:pw \
 -d  @- <<'EOF'
 
 {  "tenant_name":"MASTER",  

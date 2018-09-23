@@ -6,5 +6,5 @@
 #-------------------------------------------------------------
 
 curl -H "Content-Type: application/json"  \
-	-X GET http://localhost:2999/users \
-	-u STINGRAY:pw
+	-X GET http://localhost:2998/users \
+	-u STINGRAY:mypw
