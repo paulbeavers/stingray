@@ -7,7 +7,7 @@
 
 curl -H "Content-Type: application/json"  \
 	-X POST http://localhost:2999/user \
-	-u paulbeavers@sandsol.com:pw3 \
+	-u STINGRAY:pw \
 -d  @- <<'EOF'
 
 {  "tenant_name":"New Tenant 2",  

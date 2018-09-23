@@ -2,7 +2,8 @@
 
 var restify = require('restify')
 var fs = require('fs')
-var pg = require('pg')
+
+const { Client } = require('pg')
 
 /*-------------------------------------------------------------*/
 /* Set up logging                                              */
@@ -30,8 +31,9 @@ const config = {
 	    port: process.env.DB_PORT,
 	    host: process.env.DB_HOSTNAME
 };
-var pool = new pg.Pool(config);
-pool.connect(function(err, client, done) {
+
+const client = new Client(config)
+client.connect( (err, res) => {
 	if (err)
 	{
 		logger.error('Could not connect to postgres database, exiting');
@@ -41,6 +43,7 @@ pool.connect(function(err, client, done) {
 	{
 		logger.info('Databaase connection successful.');
 	}
+	client.end();
 });
 
 /*-----------------------------------------------------------*/
@@ -93,13 +96,27 @@ server.use(function authenticate(req, res, next) {
 		TNAME = req.body.tenant_name;
 	}
 
+	var nclient = new Client(config)
+	nclient.connect((err, res) => {
+        	if (err)
+        	{
+                	logger.error('Could not connect to postgres database, exiting');
+                	process.exit(1);
+        	}
+        	else
+        	{	
+                	logger.info('Databaase connection successful.');
+        	}
+	});
+
 	var query_string = 'select * from stingray_users where user_id = ' + '\'' + req.authorization.basic.username + '\' and ';
 	query_string = query_string + 'tenant_name = ' + '\'' + TNAME + '\' and ';
 	query_string = query_string + 'password = ' + '\'' + req.authorization.basic.password + '\'';
 	logger.info(query_string);
-	pool.query(query_string, function(error, result) {
+	nclient.query(query_string, function(error, result) {
 		if (error) {
 			logger.error('postgres query failed. Check databse configuration.');
+			nclient.end();
 	    		res.json({type: false, response:"error: query failed."})
 	        }
                 else {
@@ -108,7 +125,7 @@ server.use(function authenticate(req, res, next) {
 				 logger.info('Unauthorized access by user ' + req.authorization.basic.username + 
 					' with password ' + req.authorization.basic.password + ' tenant ' +
 					TNAME);
-
+				nclient.end();
 				res.json({type: false, response:"authorization failed."})
 			 }
 			else
@@ -134,7 +151,7 @@ server.use(function authenticate(req, res, next) {
 				*/
 
 
-
+				nclient.end();
 				return next();
 			}
 		}

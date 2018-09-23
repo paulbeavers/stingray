@@ -1,7 +1,8 @@
 
 
 var fs = require('fs');
-var pg = require('pg');
+
+const { Client } = require('pg')
 
 logger = require("../stingrayLog");
 
@@ -29,8 +30,8 @@ exports.addHeartbeat = function(req, res, next) {
 		            host: process.env.DB_HOSTNAME
 	};
 
-	var pool = new pg.Pool(config);
-	pool.connect(function(err, client, done) {
+	var client = new Client(config);
+	client.connect( (err, res) => {
 		if (err)
 		{	
 			logger.error("Error could not connect to database.");
@@ -55,14 +56,16 @@ exports.addHeartbeat = function(req, res, next) {
 	//-----------------------------------------------------------
 	qs = prepareInsertStatement(req, res);
 	logger.info(qs);
-	pool.query(qs, function(error, result) {
+	client.query(qs, function(error, result) {
        		if (error) {
 			logger.error("Heartbeat insert failed.");
+			client.end();
         		res.json({type: true, response:"error: insert failed"})
 		}
 		else
 		{
 			logger.info("Heartbeat insert successful.");
+			client.end();
         		res.json({type: true, response:"success: update successful."})
 		}
 	});

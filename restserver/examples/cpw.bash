@@ -7,12 +7,12 @@
 
 curl -H "Content-Type: application/json"  \
 	-X POST http://localhost:2999/user \
-	-u STINGRAY:stingraypw \
+	-u STINGRAY:mypw \
 -d  @- <<'EOF'
 
 {  "tenant_name":"MASTER",  
     "user_id":"STINGRAY", 
-    "password":"mypw",  
+    "password":"pw",  
     "role":"SUPERADMIN" 
 }
 

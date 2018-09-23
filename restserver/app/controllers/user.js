@@ -1,6 +1,6 @@
 
 var fs = require('fs');
-var pg = require('pg');
+const { Client } = require('pg')
 
 logger = require("../stingrayLog");
 
@@ -28,11 +28,12 @@ exports.manageUser = function(req, res, next) {
 		            host: process.env.DB_HOSTNAME
 	};
 
-	var pool = new pg.Pool(config);
-	pool.connect(function(err, client, done) {
+	var client = new Client(config);
+        client.connect( (err, res) => {
 		if (err)
 		{	
 			logger.error("Could not connect to database.");
+			client.end();
 			res.json({type: false, response:"error: could not connect to database."})
         	}		
         	else
@@ -57,13 +58,15 @@ exports.manageUser = function(req, res, next) {
 	{
 		logger.info("This is a password change request, update the password.");
 		qs = prepareUpdatePasswordSQL(req, res);
-		pool.query(qs, function(error, result) {
+		client.query(qs, function(error, result) {
 			if (error) {
 				logger.error("Error password update failed");
+				client.end();
 				res.json({type: false, response:"error: update failed."});
 			}
 			else {
 				logger.info("Password update successful.");
+				client.end();
 				res.json({type: true, response:"success: update successful."})
                 	}
         	});
@@ -78,28 +81,32 @@ exports.manageUser = function(req, res, next) {
 				req.requester_tenant_name == req.body.tenant_name) && 
 				(req.body.role != "SUPERADMIN")) {
 			qs = prepareInsertStatement(req, res);
-			pool.query(qs, function(error, result) {
+			client.query(qs, function(error, result) {
 			        if (error) {
 					qs = prepareUpdateStatement(req, res);
-					pool.query(qs, function(error, result) {
+					client.query(qs, function(error, result) {
 						if (error) {
 							logger.error("Error insert and update failed.");
+							client.end();
 							res.json({type: false, response:"error: update and insert failed."});
 						}
 						else {
 							logger.info("User updated successfully.");
+							client.end();
 							res.json({type: true, response:"success: update successful."})
 						}
 					});
 		        	}
 		        	else {
 					logger.info("New user added successfully.");
+					client.end();
 			        	res.json({type: true, response:"success: update successful."})
 				}
 	                });
 		}
 		else {
 			logger.error("User unauthorized to make this change.");
+			client.end();
 			res.json({type: false, response:"user not authorized to make this change"});
 		}
 	}
@@ -152,11 +159,12 @@ exports.getUsers = function(req, res, next) {
                             host: process.env.DB_HOSTNAME
         };
 
-        var pool = new pg.Pool(config);
-        pool.connect(function(err, client, done) {
+	var client = new Client(config);
+        client.connect( (err, res) => {
                 if (err)
                 {
                         console.log("Could not connect to database.");
+			client.end();
                         res.json({type: false, response:"error: could not connect to database."})
                 }
                 else
@@ -166,19 +174,21 @@ exports.getUsers = function(req, res, next) {
         });
 
 	var query_string = 'select * from stingray_users'; 
-        pool.query(query_string, function(error, result) {
+        client.query(query_string, function(error, result) {
                 if (error) {
                         console.log('query failed');
+			client.end();
                         res.json({type: false, response:"error: query failed."})
                 }
                 else {
                          if (result.rowCount === 0) {
+				 client.end();
                                  res.json({type: false, response:"authorization failed."})
                          }
                         else
                         {
                                 console.log(result.rows)
-
+				client.end();
 				res.json(result.rows)
 
                                 return next();
@@ -209,8 +219,8 @@ exports.getUserById = function(req, res, next) {
                             host: process.env.DB_HOSTNAME
         };
 
-        var pool = new pg.Pool(config);
-        pool.connect(function(err, client, done) {
+	var client = new Client(config);
+        client.connect( (err, res) => {
                 if (err)
                 {
                         console.log("Could not connect to database.");
@@ -223,7 +233,7 @@ exports.getUserById = function(req, res, next) {
         });
 
 	var query_string = 'select * from stingray_users where user_id = \'' + req.params.id + '\'';  
-        pool.query(query_string, function(error, result) {
+        client.query(query_string, function(error, result) {
                 if (error) {
                         console.log('query failed');
                         res.json({type: false, response:"error: query failed."})
@@ -235,7 +245,7 @@ exports.getUserById = function(req, res, next) {
                         else
                         {
                                 console.log(result.rows)
-
+				client.end();
 				res.json(result.rows)
 
                                 return next();
