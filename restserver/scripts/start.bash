@@ -7,17 +7,19 @@
 #---------------------------------------------------------------------
 # Load configuration
 #---------------------------------------------------------------------
-export PORT=2999
-export SERVER_HOME=/home/pbeavers/stingray/restserver
-export DATA_DIR="$SERVER_HOME/data"
-export DB_STRING=postgres://stingray_user:stingraypw@localhost:5432/stingraydb
-export DB_HOSTNAME=localhost
-export DB_PORT=5432
-export DB_USER=stingray_user
-export DB_PASSWORD=stingraypw
-export DB_DATABASE=stingraydb
-export LOG_DIR="$SERVER_HOME/log"
-export LOG_LEVEL="info"
+source $HOSTNAME.conf
+
+echo PORT=$PORT
+echo SERVER_HOME=$SERVER_HOME
+echo DATA_DIR=$DATA_DIR
+echo DB_STRING=$DB_STRING
+echo DB_HOSTNAME=$DB_HOSTNAME
+echo DB_PORT=$DB_PORT
+echo DB_USER=$DB_USER
+echo DB_PASSWORD=$DB_PASSWORD
+echo DB_DATABASE=$DB_DATABASE
+echo LOG_DIR=$LOG_DIR
+echo LOG_LEVEL=$LOG_LEVEL
 
 #---------------------------------------------------------------------
 # Start the server
